@@ -6,7 +6,6 @@
 <title>Southern Africa Itinerary — Live</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     display: flex;
     flex-direction: column;
@@ -65,7 +64,11 @@
     text-transform: uppercase;
     background: #F7F3ED;
   }
-  #not-found p { max-width: 420px; text-align: center; line-height: 1.8; }
+  #not-found p {
+    max-width: 420px;
+    text-align: center;
+    line-height: 1.8;
+  }
   #not-found code {
     background: #fff;
     border: 1px solid #D9D0C4;
@@ -108,15 +111,13 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CONFIGURATION
+// CONFIGURATION
 // ══════════════════════════════════════════════════════════════
 const CONFIG = {
   DRIVE_FOLDER_ID  : '1jVXmpDT5TmZ99Q05ArA-CbnWpUAqjAeT',
   GOOGLE_API_KEY   : 'AIzaSyBZndrLXYsyBMIy8hwKblnWImaQ6pcLsQw',
-  CONTENT_FILENAME : 'itinerary.html',   // the HTML file to watch in Drive
+  CONTENT_FILENAME : 'itinerary.html',
   REFRESH_MINUTES  : 5,
-
-  // Match image filenames in Drive to banner element IDs in the HTML
   BANNER_KEYWORDS  : {
     departure    : ['departure', 'chicago', 'ord'],
     johannesburg : ['johannesburg', 'joburg', 'jnb', 'rosebank', 'hyde'],
@@ -129,7 +130,7 @@ const CONFIG = {
 };
 
 // ══════════════════════════════════════════════════════════════
-//  DRIVE API
+// DRIVE API
 // ══════════════════════════════════════════════════════════════
 async function listDriveFiles() {
   const q      = `'${CONFIG.DRIVE_FOLDER_ID}' in parents and trashed = false`;
@@ -159,21 +160,55 @@ function driveImageUrl(fileId) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  IMAGE INJECTION
-//  Parses the fetched HTML, finds banner divs by ID,
-//  replaces their background-image with Drive photo URLs.
+// CSS INJECTION
+// Injects viewer-specific CSS to ensure consistent padding and
+// layout regardless of which itinerary version is in Drive.
+// ══════════════════════════════════════════════════════════════
+const VIEWER_CSS = `
+  /* ── Viewer layout overrides ── */
+  body {
+    padding: 0 !important;
+  }
+  .overview {
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+  }
+  .days-section {
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+  }
+  .todo-section {
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+  }
+  /* Photo banners stay full-bleed */
+  .photo-banner,
+  .cover {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+`;
+
+// ══════════════════════════════════════════════════════════════
+// IMAGE + CSS INJECTION
 // ══════════════════════════════════════════════════════════════
 function injectImages(htmlText, files) {
   const parser = new DOMParser();
   const doc    = parser.parseFromString(htmlText, 'text/html');
 
+  // Inject viewer CSS overrides
+  const styleEl = doc.createElement('style');
+  styleEl.id    = 'viewer-overrides';
+  styleEl.textContent = VIEWER_CSS;
+  doc.head.appendChild(styleEl);
+
+  // Inject Drive images into banner elements
   for (const [bannerId, keywords] of Object.entries(CONFIG.BANNER_KEYWORDS)) {
     const imgFile = files.find(f =>
       f.mimeType.startsWith('image/') &&
       keywords.some(kw => f.name.toLowerCase().includes(kw))
     );
     if (!imgFile) continue;
-
     const el = doc.getElementById(`banner-${bannerId}`);
     if (el) {
       el.style.backgroundImage = `url('${driveImageUrl(imgFile.id)}')`;
@@ -184,76 +219,76 @@ function injectImages(htmlText, files) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  STATUS BAR
+// STATUS BAR
 // ══════════════════════════════════════════════════════════════
 function setBar(msg, state) {
   const bar = document.getElementById('status-bar');
   const txt = document.getElementById('bar-msg');
   const ts  = document.getElementById('bar-time');
-  bar.className = state;
-  txt.textContent = msg;
-  ts.textContent  = state === 'ok' ? `Last updated ${new Date().toLocaleTimeString()}` : '';
+  bar.className    = state;
+  txt.textContent  = msg;
+  ts.textContent   = state === 'ok'
+    ? `Last updated ${new Date().toLocaleTimeString()}`
+    : '';
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MAIN REFRESH LOOP
+// MAIN REFRESH LOOP
 // ══════════════════════════════════════════════════════════════
 let lastModifiedTime = null;
 let currentBlobUrl   = null;
 
 async function refresh() {
-  setBar('⟳  Checking Google Drive for updates…', 'loading');
-
+  setBar('⟳ Checking Google Drive for updates…', 'loading');
   try {
     const files = await listDriveFiles();
 
     // Find itinerary.html in the folder
     const htmlFile = files.find(f => f.name === CONFIG.CONTENT_FILENAME);
-
     if (!htmlFile) {
-      setBar(`⚠  Upload "${CONFIG.CONTENT_FILENAME}" to your Drive folder to get started`, 'warn');
+      setBar(`⚠ Upload "${CONFIG.CONTENT_FILENAME}" to your Drive folder to get started`, 'warn');
       document.getElementById('content-frame').style.display = 'none';
-      document.getElementById('not-found').style.display     = 'flex';
+      document.getElementById('not-found').style.display = 'flex';
       return;
     }
 
     // Skip if nothing has changed
     if (htmlFile.modifiedTime === lastModifiedTime) {
-      setBar('✓  Up to date', 'ok');
+      setBar('✓ Up to date', 'ok');
       return;
     }
 
     // Fetch the HTML content
-    const rawHtml = await fetchText(htmlFile.id);
+    const rawHtml  = await fetchText(htmlFile.id);
 
-    // Inject Drive images into banner elements
+    // Inject viewer CSS + Drive images into banner elements
     const finalHtml = injectImages(rawHtml, files);
 
     // Render in iframe via a Blob URL
     if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-    const blob     = new Blob([finalHtml], { type: 'text/html' });
-    currentBlobUrl = URL.createObjectURL(blob);
-
-    const frame = document.getElementById('content-frame');
-    frame.src   = currentBlobUrl;
+    const blob       = new Blob([finalHtml], { type: 'text/html' });
+    currentBlobUrl   = URL.createObjectURL(blob);
+    const frame      = document.getElementById('content-frame');
+    frame.src        = currentBlobUrl;
     frame.style.display = 'block';
     document.getElementById('not-found').style.display = 'none';
-
     lastModifiedTime = htmlFile.modifiedTime;
-    setBar('✓  Itinerary loaded from Google Drive', 'ok');
+    setBar('✓ Itinerary loaded from Google Drive', 'ok');
 
   } catch (err) {
     console.error('[Drive viewer]', err);
-    // If content is already showing, just warn in the bar
     if (currentBlobUrl) {
-      setBar(`⚠  Drive unreachable (${err.message}) — showing last version`, 'warn');
+      setBar(`⚠ Drive unreachable (${err.message}) — showing last version`, 'warn');
     } else {
-      setBar(`✗  Could not reach Drive: ${err.message}`, 'error');
+      setBar(`✗ Could not reach Drive: ${err.message}`, 'error');
     }
   }
 }
 
-function manualRefresh() { lastModifiedTime = null; refresh(); }
+function manualRefresh() {
+  lastModifiedTime = null;
+  refresh();
+}
 
 // ── Boot ──────────────────────────────────────────────────────
 refresh();
