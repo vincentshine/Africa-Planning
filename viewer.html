@@ -227,6 +227,64 @@
     color: rgba(255,255,255,0.35);
     z-index: 2;
   }
+
+  /* TO-DO / TRANSFER CHECKLIST */
+  .todo-section {
+    background: var(--cream);
+    padding: 44px 50px;
+    border-bottom: 1px solid var(--border);
+  }
+  .todo-inner { max-width: 900px; }
+  .todo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+  }
+  .todo-table thead tr { border-bottom: 1px solid var(--gold); }
+  .todo-table th {
+    font-size: 7pt; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); font-weight: 500; padding: 0 10px 10px 10px; text-align: left;
+  }
+  .todo-table th:first-child { padding-left: 0; }
+  .todo-row td {
+    padding: 10px 10px; vertical-align: top;
+    border-bottom: 1px solid var(--border); color: var(--dark); line-height: 1.5;
+  }
+  .todo-row td:first-child { padding-left: 0; }
+  .todo-row.done td {
+    color: var(--warm-gray);
+    text-decoration: line-through;
+    text-decoration-color: var(--warm-gray);
+  }
+  .todo-row.done .col-notes { text-decoration: none; font-style: italic; color: var(--warm-gray); }
+  .col-status { width: 28px; }
+  .col-who    { width: 90px; font-weight: 500; }
+  .col-task   { width: 38%; }
+  .col-notes  { color: var(--warm-gray); font-size: 8.5pt; }
+
+  .todo-label { display: inline-flex; align-items: center; cursor: pointer; user-select: none; }
+  .todo-label input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .todo-box {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 17px; height: 17px; border: 1.5px solid var(--border); border-radius: 3px;
+    background: white; transition: background 0.15s, border-color 0.15s; flex-shrink: 0;
+  }
+  .todo-box::after {
+    content: ''; display: block; width: 5px; height: 9px;
+    border: 2px solid transparent; border-top: none; border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px); transition: border-color 0.15s;
+  }
+  .todo-label:hover .todo-box { border-color: var(--gold); }
+  .todo-label input:checked + .todo-box { background: var(--accent-green); border-color: var(--accent-green); }
+  .todo-label input:checked + .todo-box::after { border-color: white; }
+
+  .todo-date-row td { padding: 18px 0 6px 0; border-bottom: none; }
+  .todo-date-row:first-child td { padding-top: 4px; }
+  .todo-date-badge {
+    display: inline-block; font-size: 7pt; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--cream); background: var(--dark);
+    padding: 3px 10px; border-radius: 2px;
+  }
 </style>
 </head>
 <body>
