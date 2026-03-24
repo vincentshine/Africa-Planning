@@ -110,9 +110,6 @@
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-// CONFIGURATION
-// ══════════════════════════════════════════════════════════════
 const CONFIG = {
   DRIVE_FOLDER_ID  : '1jVXmpDT5TmZ99Q05ArA-CbnWpUAqjAeT',
   GOOGLE_API_KEY   : 'AIzaSyBZndrLXYsyBMIy8hwKblnWImaQ6pcLsQw',
@@ -129,9 +126,6 @@ const CONFIG = {
   }
 };
 
-// ══════════════════════════════════════════════════════════════
-// DRIVE API
-// ══════════════════════════════════════════════════════════════
 async function listDriveFiles() {
   const q      = `'${CONFIG.DRIVE_FOLDER_ID}' in parents and trashed = false`;
   const fields = 'files(id,name,mimeType,modifiedTime)';
@@ -159,32 +153,25 @@ function driveImageUrl(fileId) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1400-h400-c`;
 }
 
-// ══════════════════════════════════════════════════════════════
 // CSS INJECTION
 // Minimal overrides — the itinerary handles its own layout.
 // Do NOT override .photo-banner width/margin: the itinerary uses
 // margin: 0 -50px / width: calc(100%+100px) for full-bleed banners
 // and any !important override here will break that effect.
-// ══════════════════════════════════════════════════════════════
 const VIEWER_CSS = `
   /* ── Viewer layout overrides ── */
   body { padding: 0 !important; }
 `;
 
-// ══════════════════════════════════════════════════════════════
-// IMAGE + CSS INJECTION
-// ══════════════════════════════════════════════════════════════
 function injectImages(htmlText, files) {
   const parser = new DOMParser();
   const doc    = parser.parseFromString(htmlText, 'text/html');
 
-  // Inject viewer CSS overrides
   const styleEl = doc.createElement('style');
   styleEl.id    = 'viewer-overrides';
   styleEl.textContent = VIEWER_CSS;
   doc.head.appendChild(styleEl);
 
-  // Inject Drive images into banner elements
   for (const [bannerId, keywords] of Object.entries(CONFIG.BANNER_KEYWORDS)) {
     const imgFile = files.find(f =>
       f.mimeType.startsWith('image/') &&
@@ -200,9 +187,6 @@ function injectImages(htmlText, files) {
   return '<!DOCTYPE html>' + doc.documentElement.outerHTML;
 }
 
-// ══════════════════════════════════════════════════════════════
-// STATUS BAR
-// ══════════════════════════════════════════════════════════════
 function setBar(msg, state) {
   const bar = document.getElementById('status-bar');
   const txt = document.getElementById('bar-msg');
@@ -214,9 +198,6 @@ function setBar(msg, state) {
     : '';
 }
 
-// ══════════════════════════════════════════════════════════════
-// MAIN REFRESH LOOP
-// ══════════════════════════════════════════════════════════════
 let lastModifiedTime = null;
 let currentBlobUrl   = null;
 
@@ -225,7 +206,6 @@ async function refresh() {
   try {
     const files = await listDriveFiles();
 
-    // Find itinerary.html in the folder
     const htmlFile = files.find(f => f.name === CONFIG.CONTENT_FILENAME);
     if (!htmlFile) {
       setBar(`⚠ Upload "${CONFIG.CONTENT_FILENAME}" to your Drive folder to get started`, 'warn');
@@ -234,19 +214,14 @@ async function refresh() {
       return;
     }
 
-    // Skip if nothing has changed
     if (htmlFile.modifiedTime === lastModifiedTime) {
       setBar('✓ Up to date', 'ok');
       return;
     }
 
-    // Fetch the HTML content
-    const rawHtml  = await fetchText(htmlFile.id);
-
-    // Inject viewer CSS + Drive images into banner elements
+    const rawHtml   = await fetchText(htmlFile.id);
     const finalHtml = injectImages(rawHtml, files);
 
-    // Render in iframe via a Blob URL
     if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
     const blob       = new Blob([finalHtml], { type: 'text/html' });
     currentBlobUrl   = URL.createObjectURL(blob);
@@ -272,7 +247,6 @@ function manualRefresh() {
   refresh();
 }
 
-// ── Boot ──────────────────────────────────────────────────────
 refresh();
 setInterval(refresh, CONFIG.REFRESH_MINUTES * 60 * 1000);
 </script>
