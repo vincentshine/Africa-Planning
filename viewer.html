@@ -260,6 +260,113 @@
   </div>
 </div>
 
+<!-- PRE-DEPARTURE TO DO -->
+<div class="todo-section">
+  <div class="todo-inner">
+    <div class="section-heading" style="margin-bottom:20px;">Transfer Confirmations</div>
+    <table class="todo-table">
+      <thead>
+        <tr>
+          <th class="col-status"></th>
+          <th class="col-task">Transfer</th>
+          <th class="col-notes">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="todo-date-row"><td colspan="3"><span class="todo-date-badge">Sept 7</span></td></tr>
+        <tr class="todo-row done" data-id="todo-0">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="todo-0"><span class="todo-box"></span></label></td>
+          <td class="col-task">Zambezi Queen → Pioneers Lodge, Victoria Falls</td>
+          <td class="col-notes">✓ <strong>CONFIRMED</strong> — Zambezi Queen Collection arranges 1.5hr road transfer. Cost: R1,400/person (~$75 USD) · Lynne Van Wyk · lynne@zqcollection.com · +27 21 715 2412</td>
+        </tr>
+        <tr class="todo-date-row"><td colspan="3"><span class="todo-date-badge">Sept 9</span></td></tr>
+        <tr class="todo-row done" data-id="todo-1">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="todo-1"><span class="todo-box"></span></label></td>
+          <td class="col-task">Pioneers Lodge → Bomani Tented Lodge</td>
+          <td class="col-notes">✓ <strong>CONFIRMED</strong> — Imvelo confirms road transfer from Victoria Falls is included in the package. Contact: Sihle Juba · res4@imvelosafarilodges.com · +263 771 787 176.</td>
+        </tr>
+        <tr class="todo-date-row"><td colspan="3"><span class="todo-date-badge">Sept 12</span></td></tr>
+        <tr class="todo-row done" data-id="todo-2">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="todo-2"><span class="todo-box"></span></label></td>
+          <td class="col-task">Bomani Lodge → Cape Town</td>
+          <td class="col-notes">✓ <strong>CONFIRMED</strong> — Charter Bomani → VFA included in Bomani package; will make the 1:25 PM departure. Commercial VFA → CPT booked: Flight Network order 1124-696-819, departs 13:25, arrives 16:30, $1,335.57 USD.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-heading" style="margin-top:36px; margin-bottom:16px;">Pre-Departure To Do</div>
+    <table class="todo-table">
+      <thead>
+        <tr>
+          <th class="col-status"></th>
+          <th class="col-who">Who</th>
+          <th class="col-task">Task</th>
+          <th class="col-notes">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="todo-row" data-id="td-0">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-0"><span class="todo-box"></span></label></td>
+          <td class="col-who">—</td>
+          <td class="col-task">Immunizations</td>
+          <td class="col-notes">South Africa, Botswana, Zimbabwe, Namibian</td>
+        </tr>
+        <tr class="todo-row" data-id="td-1">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-1"><span class="todo-box"></span></label></td>
+          <td class="col-who">Debbie</td>
+          <td class="col-task">Book Tours in Cape Town</td>
+          <td class="col-notes">—</td>
+        </tr>
+        <tr class="todo-row" data-id="td-2">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-2"><span class="todo-box"></span></label></td>
+          <td class="col-who">—</td>
+          <td class="col-task">Check Travel Insurance for limits</td>
+          <td class="col-notes">—</td>
+        </tr>
+        <tr class="todo-row" data-id="td-3">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-3"><span class="todo-box"></span></label></td>
+          <td class="col-who">—</td>
+          <td class="col-task">Send information to Hotels &amp; Camps</td>
+          <td class="col-notes">Pickup location in VFA · guest weights · dietary requirements · interests · health notes · nationality</td>
+        </tr>
+        <tr class="todo-row" data-id="td-4">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-4"><span class="todo-box"></span></label></td>
+          <td class="col-who">Vincent</td>
+          <td class="col-task">Do we need Visas?</td>
+          <td class="col-notes">Confirm current fee at zimimmigration.gov.zw · Zimbabwe visa required on arrival at VFA (~$50 USD per person) · Apply via evisa.gov.zw</td>
+        </tr>
+        <tr class="todo-row" data-id="td-5">
+          <td class="col-status"><label class="todo-label"><input type="checkbox" class="todo-cb" data-id="td-5"><span class="todo-box"></span></label></td>
+          <td class="col-who">—</td>
+          <td class="col-task">Confirm Transfer: Zambezi Queen → Victoria Falls</td>
+          <td class="col-notes">✓ <strong>CONFIRMED</strong> — Zambezi Queen Collection arranges 1.5hr road transfer · R1,400/person (~$75 USD) · Lynne Van Wyk · lynne@zqcollection.com</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+(function() {
+  var STORAGE_KEY = 'sa2026_todo';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) {}
+  function applyRow(cb) {
+    var row = document.querySelector('tr[data-id="' + cb.dataset.id + '"]');
+    if (!row) return;
+    if (cb.checked) { row.classList.add('done'); } else { row.classList.remove('done'); }
+  }
+  document.querySelectorAll('.todo-cb').forEach(function(cb) {
+    if (cb.dataset.id in saved) { cb.checked = saved[cb.dataset.id]; }
+    applyRow(cb);
+    cb.addEventListener('change', function() {
+      saved[cb.dataset.id] = cb.checked;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch(e) {}
+      applyRow(cb);
+    });
+  });
+})();
+</script>
+
 <!-- ROUTE OVERVIEW -->
 <div class="overview">
   <div class="section-heading">Journey Route</div>
