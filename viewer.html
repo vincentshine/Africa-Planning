@@ -161,32 +161,14 @@ function driveImageUrl(fileId) {
 
 // ══════════════════════════════════════════════════════════════
 // CSS INJECTION
-// Injects viewer-specific CSS to ensure consistent padding and
-// layout regardless of which itinerary version is in Drive.
+// Minimal overrides — the itinerary handles its own layout.
+// Do NOT override .photo-banner width/margin: the itinerary uses
+// margin: 0 -50px / width: calc(100%+100px) for full-bleed banners
+// and any !important override here will break that effect.
 // ══════════════════════════════════════════════════════════════
 const VIEWER_CSS = `
   /* ── Viewer layout overrides ── */
-  body {
-    padding: 0 !important;
-  }
-  .overview {
-    padding-left: 50px !important;
-    padding-right: 50px !important;
-  }
-  .days-section {
-    padding-left: 50px !important;
-    padding-right: 50px !important;
-  }
-  .todo-section {
-    padding-left: 50px !important;
-    padding-right: 50px !important;
-  }
-  /* Photo banners stay full-bleed */
-  .photo-banner,
-  .cover {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
+  body { padding: 0 !important; }
 `;
 
 // ══════════════════════════════════════════════════════════════
